@@ -40,7 +40,8 @@ class _NotepadScreenState extends State<NotepadScreen> {
                 final note = widget.user.notes[index];
                 return ListTile(
                   title: Text(note.text),
-                  subtitle: Text(DateFormat('MM.dd.yyyy HH:mm').format(note.date)),
+                  subtitle:
+                      Text(DateFormat('dd.MM.yyyy HH:mm').format(note.date)),
                   onTap: () {
                     _controller.text = note.text;
                   },
