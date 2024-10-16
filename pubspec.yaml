@@ -1,0 +1,52 @@
+name: fuesse_und_fusspflege_cw
+description: "Christina's App"
+
+# Prevent accidental publishing to pub.dev.
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  android_alarm_manager_plus: ^4.0.2
+  file_picker: ^8.0.2
+  flutter:
+    sdk: flutter
+  flutter_email_sender: ^6.0.2
+  flutter_launcher_icons: ^0.13.1
+  flutter_localizations:
+    sdk: flutter
+  flutter_signature_pad: ^3.0.1
+
+  fluttertoast: ^8.2.4
+  intl: any
+  open_file: ^3.3.2
+  path_provider: ^2.1.2
+  pdf: ^3.10.8
+  permission_handler: ^11.3.0
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+  uuid: ^4.4.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Enable generation of localized Strings from arb files.
+  generate: true
+
+  assets:
+    # Add assets from the images directory to the application.
+    - assets/images/
+    - assets/datenschutzPDF.pdf
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.jpeg"
