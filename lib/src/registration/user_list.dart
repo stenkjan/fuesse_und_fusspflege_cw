@@ -122,7 +122,7 @@ class UserListState extends State<UserList> {
           return Material(
             child: ListTile(
               leading: Radio(
-                fillColor: MaterialStateProperty.all(Colors.blueAccent),
+                fillColor: WidgetStateProperty.all(Colors.blueAccent),
                 value: user.userId,
                 groupValue:
                     Provider.of<UserListProvider>(context, listen: false)
