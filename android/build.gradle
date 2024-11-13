@@ -1,3 +1,15 @@
+buildscript {
+    ext.kotlin_version = '2.0.21'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:7.3.0'
+    }
+}
+
 allprojects {
     repositories {
         google()
@@ -6,7 +18,7 @@ allprojects {
 
     configurations.all {
         resolutionStrategy {
-            force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0'
+            force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21'
         }
     }
 
@@ -15,7 +27,7 @@ allprojects {
             resolutionStrategy.eachDependency { details ->
                 if (details.requested.group == 'org.jetbrains.kotlin'
                     && details.requested.name.contains('kotlin-stdlib')) {
-                    details.useVersion '1.6.0'
+                    details.useVersion '2.0.21'
                 }
             }
         }

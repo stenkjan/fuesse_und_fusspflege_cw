@@ -102,8 +102,8 @@ class _NotepadScreenState extends State<NotepadScreen> with WidgetsBindingObserv
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.save),
           onPressed: _saveNote,
+          child: const Icon(Icons.save),
         ),
       ),
     );
