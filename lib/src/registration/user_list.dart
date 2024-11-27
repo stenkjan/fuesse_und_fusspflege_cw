@@ -83,11 +83,6 @@ class UserListState extends State<UserList> {
       Provider.of<UserListProvider>(context, listen: false)
           .setTitle('Nageldesign und Fußpflege');
     });
-    // readUserList().then((users) {
-    //   setState(() {
-    //     _users = users;
-    //   });
-    // });
   }
 
   @override
@@ -132,7 +127,16 @@ class UserListState extends State<UserList> {
                       .selectUser(value!);
                 },
               ),
-              title: Text(user.name),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(user.name),
+                  Text(
+                    DateFormat('MM.yy HH:mm').format(user.lastEdited),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
               subtitle:
                   Text(DateFormat('dd.MM.yyyy').format(user.dateOfBirth!)),
               trailing: Row(
@@ -276,17 +280,26 @@ class UserListState extends State<UserList> {
                         ),
                         ListTile(
                           leading: const Icon(Icons.mail),
-                          title:
-                              const Text('Einwilligungserklärung als PDF und senden'),
+                          title: const Text(
+                              'Einwilligungserklärung als PDF und senden'),
                           onTap: () {
                             if (userListProvider.selectedUser?.consent !=
                                 null) {
                               generateConsentPdfAndSend(
-                                  userListProvider.selectedUser!.consent!, userListProvider.selectedUser!);
+                                  userListProvider.selectedUser!.consent!,
+                                  userListProvider.selectedUser!);
                             }
                             Navigator.pop(context);
                           },
                         ),
+                        // ListTile(
+                        //   leading: const Icon(Icons.backup),
+                        //   title: const Text('Backup Exportieren'),
+                        //   onTap: () async {
+                        //     await userListProvider.exportUserList();
+                        //     Navigator.pop(context);
+                        //   },
+                        // ),
                       ],
                     );
                   },

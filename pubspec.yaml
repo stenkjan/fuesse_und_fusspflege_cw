@@ -15,10 +15,10 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_email_sender: ^6.0.2
-  flutter_launcher_icons: ^0.13.1
   flutter_localizations:
     sdk: flutter
-  flutter_signature_pad: ^3.0.1
+  # flutter_signature_pad: ^3.0.1
+  signature: ^5.5.0
 
   fluttertoast: ^8.2.4
   intl: any
@@ -29,10 +29,11 @@ dependencies:
   provider: ^6.1.1
   shared_preferences: ^2.2.2
   uuid: ^4.4.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^3.0.0
 
 flutter:

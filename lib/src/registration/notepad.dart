@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/note.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_provider.dart';
 
 class NotepadScreen extends StatefulWidget {
   final User user;
@@ -13,7 +16,8 @@ class NotepadScreen extends StatefulWidget {
   _NotepadScreenState createState() => _NotepadScreenState();
 }
 
-class _NotepadScreenState extends State<NotepadScreen> with WidgetsBindingObserver {
+class _NotepadScreenState extends State<NotepadScreen>
+    with WidgetsBindingObserver {
   final _controller = TextEditingController();
 
   @override
@@ -40,7 +44,7 @@ class _NotepadScreenState extends State<NotepadScreen> with WidgetsBindingObserv
     return true;
   }
 
-  void _saveNote() {
+  void _saveNote() async {
     final note = Note(
       userId: widget.user.userId,
       text: _controller.text,
@@ -50,6 +54,33 @@ class _NotepadScreenState extends State<NotepadScreen> with WidgetsBindingObserv
       widget.user.notes.add(note);
     });
     _controller.clear();
+
+    final userListProvider =
+        Provider.of<UserListProvider>(context, listen: false);
+    bool success =
+        await userListProvider.updateUser(widget.user.userId, widget.user);
+
+    if (success) {
+      Fluttertoast.showToast(
+        msg: "Gespeichert",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: "Fehler beim Speichern",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
 
     widget.user.hasNotes.value = true;
 
@@ -83,7 +114,8 @@ class _NotepadScreenState extends State<NotepadScreen> with WidgetsBindingObserv
                   final note = widget.user.notes[index];
                   return ListTile(
                     title: Text(note.text),
-                    subtitle: Text(DateFormat('dd.MM.yyyy HH:mm').format(note.date)),
+                    subtitle:
+                        Text(DateFormat('dd.MM.yyyy HH:mm').format(note.date)),
                     onTap: () {
                       _controller.text = note.text;
                     },

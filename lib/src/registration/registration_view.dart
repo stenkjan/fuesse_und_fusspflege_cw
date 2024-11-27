@@ -3,10 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/navbar.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/note.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/signature_screen.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_provider.dart';
 import 'package:intl/intl.dart';
-import 'package:flutter_signature_pad/flutter_signature_pad.dart';
+// import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'user_signature.dart' as sig;
 import 'package:provider/provider.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user_signature.dart';
@@ -68,8 +69,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
   final birthDateController = TextEditingController();
   // final _dateController2 = TextEditingController();
 
-  final _signatureCanvasKey1 = GlobalKey<SignatureState>();
-  final _signatureCanvasKey2 = GlobalKey<SignatureState>();
+  // final _signatureCanvasKey1 = GlobalKey<SignatureState>();
+  // final _signatureCanvasKey2 = GlobalKey<SignatureState>();
 
   final _signatureFormKey1 = GlobalKey<FormState>();
   final _signatureFormKey2 = GlobalKey<FormState>();
@@ -77,8 +78,11 @@ class _RegistrationFormState extends State<RegistrationForm> {
   var color = Colors.black;
   var strokeWidth = 2.0;
 
-  bool _signatureTouched1 = false;
-  bool _signatureTouched2 = false;
+  // bool _signatureTouched1 = false;
+  // bool _signatureTouched2 = false;
+
+  Uint8List? _signatureData1;
+  Uint8List? _signatureData2;
 
   bool isEditingUser = false;
   // List<User> userList = [];
@@ -641,50 +645,77 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black),
                 ),
-                child: Stack(
-                  children: [
-                    Form(
-                      key: _signatureFormKey1,
-                      child: IgnorePointer(
-                        ignoring: widget.user != null,
-                        child: ColorFiltered(
-                          colorFilter: widget.user != null
-                              ? const ColorFilter.mode(
-                                  Colors.grey, BlendMode.saturation)
-                              : const ColorFilter.mode(
-                                  Colors.transparent, BlendMode.saturation),
-                          child: SignatureTile(
-                            color: color,
-                            signatureKey: _signatureCanvasKey1,
-                            strokeWidth: strokeWidth,
-                            onSign: (touched) {
-                              setState(() {
-                                _signatureTouched1 = touched;
-                              });
-                            },
-                          ),
-                        ),
+                child: GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SignatureScreen(),
                       ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: widget.user == null
-                            ? () {
-                                setState(() {
-                                  _signatureCanvasKey1.currentState!.clear();
-                                  _signatureTouched1 = false;
-                                });
-                              }
-                            : null,
-                      ),
-                    ),
-                  ],
+                    );
+                    if (result != null) {
+                      setState(() {
+                        _signatureData1 = result;
+                      });
+                    }
+                  },
+                  child: _signatureData1 != null
+                      ? Image.memory(_signatureData1!)
+                      : const Center(child: Text('Tap to sign')),
                 ),
               ),
             ),
+            // ListTile(
+            //   title: const Text('Unterschrift'),
+            //   subtitle: Container(
+            //     height: 200,
+            //     decoration: BoxDecoration(
+            //       border: Border.all(color: Colors.black),
+            //     ),
+            //     child: Stack(
+            //       children: [
+            //         Form(
+            //           key: _signatureFormKey1,
+            //           child: IgnorePointer(
+            //             ignoring: widget.user != null,
+            //             child: ColorFiltered(
+            //               colorFilter: widget.user != null
+            //                   ? const ColorFilter.mode(
+            //                       Colors.grey, BlendMode.saturation)
+            //                   : const ColorFilter.mode(
+            //                       Colors.transparent, BlendMode.saturation),
+            //               child: SignatureTile(
+            //                 color: color,
+            //                 signatureKey: _signatureCanvasKey1,
+            //                 strokeWidth: strokeWidth,
+            //                 onSign: (touched) {
+            //                   setState(() {
+            //                     _signatureTouched1 = touched;
+            //                   });
+            //                 },
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //         Positioned(
+            //           top: 0,
+            //           right: 0,
+            //           child: IconButton(
+            //             icon: const Icon(Icons.close),
+            //             onPressed: widget.user == null
+            //                 ? () {
+            //                     setState(() {
+            //                       _signatureCanvasKey1.currentState!.clear();
+            //                       _signatureTouched1 = false;
+            //                     });
+            //                   }
+            //                 : null,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             ListTile(
               title: const Text(
                   'Hiermit willige ich ausdrücklich ein, dass meine zu Zwecken der Vertragserfüllung ( z.B. Identifikation, Abrechnung), zur Erfüllung von gesetzlichen Verpflichtungen und aus berechtigtem Interesse erhobenen Adressdaten, nämlich Name, Anschrift, Geburtsdatum, E-Mailadresse, Telefonnummer auch zum Zwecke der Übermittlung von Angeboten/Werbung verwendet werden dürfen. Diese Einwilligung ist freiwillig. Ich kann sie ohne Angaben von Gründen verweigern, ohne dass ich deswegen Nachteile zu befürchten hätte. Ich kann diese Einwilligung zudem jederzeit in Textform (z.B. Brief, E-Mail) mit Wirkung für die Zukunft widerrufen.',
@@ -728,50 +759,77 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black),
                 ),
-                child: Stack(
-                  children: [
-                    Form(
-                      key: _signatureFormKey2,
-                      child: IgnorePointer(
-                        ignoring: widget.user != null,
-                        child: ColorFiltered(
-                          colorFilter: widget.user != null
-                              ? const ColorFilter.mode(
-                                  Colors.grey, BlendMode.saturation)
-                              : const ColorFilter.mode(
-                                  Colors.transparent, BlendMode.saturation),
-                          child: SignatureTile(
-                            color: color,
-                            signatureKey: _signatureCanvasKey2,
-                            strokeWidth: strokeWidth,
-                            onSign: (touched) {
-                              setState(() {
-                                _signatureTouched2 = touched;
-                              });
-                            },
-                          ),
-                        ),
+                child: GestureDetector(
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SignatureScreen(),
                       ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: widget.user == null
-                            ? () {
-                                setState(() {
-                                  _signatureCanvasKey2.currentState!.clear();
-                                  _signatureTouched2 = false;
-                                });
-                              }
-                            : null,
-                      ),
-                    ),
-                  ],
+                    );
+                    if (result != null) {
+                      setState(() {
+                        _signatureData2 = result;
+                      });
+                    }
+                  },
+                  child: _signatureData2 != null
+                      ? Image.memory(_signatureData2!)
+                      : const Center(child: Text('Tap to sign')),
                 ),
               ),
             ),
+            // ListTile(
+            //   title: const Text('Unterschrift'),
+            //   subtitle: Container(
+            //     height: 200,
+            //     decoration: BoxDecoration(
+            //       border: Border.all(color: Colors.black),
+            //     ),
+            //     child: Stack(
+            //       children: [
+            //         Form(
+            //           key: _signatureFormKey2,
+            //           child: IgnorePointer(
+            //             ignoring: widget.user != null,
+            //             child: ColorFiltered(
+            //               colorFilter: widget.user != null
+            //                   ? const ColorFilter.mode(
+            //                       Colors.grey, BlendMode.saturation)
+            //                   : const ColorFilter.mode(
+            //                       Colors.transparent, BlendMode.saturation),
+            //               child: SignatureTile(
+            //                 color: color,
+            //                 signatureKey: _signatureCanvasKey2,
+            //                 strokeWidth: strokeWidth,
+            //                 onSign: (touched) {
+            //                   setState(() {
+            //                     _signatureTouched2 = touched;
+            //                   });
+            //                 },
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //         Positioned(
+            //           top: 0,
+            //           right: 0,
+            //           child: IconButton(
+            //             icon: const Icon(Icons.close),
+            //             onPressed: widget.user == null
+            //                 ? () {
+            //                     setState(() {
+            //                       _signatureCanvasKey2.currentState!.clear();
+            //                       _signatureTouched2 = false;
+            //                     });
+            //                   }
+            //                 : null,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -792,36 +850,17 @@ class _RegistrationFormState extends State<RegistrationForm> {
             errors.add('Bitte Geburtsdatum angeben');
           }
 
-          if ((errors.isEmpty && _signatureTouched1 && _signatureTouched2) ||
+          if ((errors.isEmpty &&
+                  _signatureData1 != null &&
+                  _signatureData2 != null) ||
               (errors.isEmpty && isEditingUser)) {
-            final Uint8List? pngBytes1 = _signatureTouched1
-                ? await sig.signaturePointsToImage(
-                    _signatureCanvasKey1.currentState!.points
-                        .whereType<Offset>()
-                        .toList(),
-                    Colors.black,
-                    5.0,
-                    const Size(500, 500),
-                  )
-                : null;
+            final Uint8List? pngBytes1 = _signatureData1;
+            final Uint8List? pngBytes2 = _signatureData2;
 
-            final Uint8List? pngBytes2 = _signatureTouched2
-                ? await sig.signaturePointsToImage(
-                    _signatureCanvasKey2.currentState!.points
-                        .whereType<Offset>()
-                        .toList(),
-                    Colors.black,
-                    5.0,
-                    const Size(500, 500),
-                  )
-                : null;
-
-            // print(pngBytes1);
-            // print(pngBytes2);
             if ((pngBytes1 == null || pngBytes2 == null) && !isEditingUser) {
               Fluttertoast.showToast(
                 msg:
-                    'Fehler beim Speichern: Pflichtfelder ausfüllen & Bitte unterschreiben',
+                    'Fehler beim Speichern: Pflichtfelder ausfüllen & Bitmaps bereitstellen',
                 toastLength: Toast.LENGTH_SHORT,
                 gravity: ToastGravity.BOTTOM,
                 timeInSecForIosWeb: 1,
@@ -831,6 +870,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
               );
               return;
             }
+
             const uuid = Uuid();
             final user = User(
                 userId: isEditingUser ? widget.user!.userId : const Uuid().v1(),
@@ -868,6 +908,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 selectedNagelerkrankungen: _selectedNagelerkrankungen,
                 selectedNagelform: _selectedNagelform,
                 selectedNagelspitzenform: _selectedNagelspitzenform,
+                lastEdited: DateTime.now(),
                 notes: userNotes);
 
             if (isEditingUser) {
@@ -900,12 +941,10 @@ class _RegistrationFormState extends State<RegistrationForm> {
             if (errors.isNotEmpty) {
               errorMessage += errors.join(', ');
             }
-            if (!_signatureTouched1 || !_signatureTouched2) {
-              if (errorMessage.isNotEmpty) {
-                errorMessage += ' & Bitte unterschreiben';
-              } else {
-                errorMessage = 'Bitte unterschreiben';
-              }
+            if (errorMessage.isNotEmpty) {
+              errorMessage += ' & Bitte unterschreiben';
+            } else {
+              errorMessage = 'Bitte unterschreiben';
             }
 
             Fluttertoast.showToast(

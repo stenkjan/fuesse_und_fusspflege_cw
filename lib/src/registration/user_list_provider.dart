@@ -62,14 +62,16 @@ class UserListProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> updateUser(String userId, User updatedUser) async {
+  Future<bool> updateUser(String userId, User updatedUser) async {
     int index = _userList.indexWhere((user) => user.userId == userId);
     if (index != -1) {
+      updatedUser.lastEdited = DateTime.now();
       _userList[index] = updatedUser;
       await _saveUserList();
-      await backupUserList();
       notifyListeners();
+      return true;
     }
+    return false;
   }
 
   Future<void> removeUser(String? userId) async {
@@ -118,8 +120,13 @@ class UserListProvider with ChangeNotifier {
     if (await importFile.exists()) {
       final importedJson = await importFile.readAsString();
       final importedList = jsonDecode(importedJson) as List;
-      final importedUsers =
-          importedList.map((userJson) => User.fromJson(userJson)).toList();
+      final importedUsers = importedList.map((userJson) {
+        final userMap = Map<String, dynamic>.from(userJson);
+        if (userMap['lastEdited'] == null) {
+          userMap['lastEdited'] = DateTime.now().toIso8601String();
+        }
+        return User.fromJson(userMap);
+      }).toList();
       _userList.clear(); // Clear the existing user list
       _userList.addAll(importedUsers); // Add the imported users
       await _saveUserList();

@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_signature_pad/flutter_signature_pad.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/consent.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_provider.dart';
-import 'package:fuesse_und_fusspflege_cw/src/registration/user_signature.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'signature_screen.dart';
+import 'dart:typed_data';
 
-class ConsentFormScreen extends StatelessWidget {
-  final GlobalKey<SignatureState> _signatureKey1 = GlobalKey<SignatureState>();
-  final GlobalKey<SignatureState> _signatureKey2 = GlobalKey<SignatureState>();
+class ConsentFormScreen extends StatefulWidget {
+  const ConsentFormScreen({super.key});
+
+  @override
+  _ConsentFormScreenState createState() => _ConsentFormScreenState();
+}
+
+class _ConsentFormScreenState extends State<ConsentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _placeController = TextEditingController();
   DateTime _date = DateTime.now();
   final _dateController = TextEditingController(text: DateFormat('dd.MM.yyyy').format(DateTime.now()));
   final _descriptionController = TextEditingController();
   final _risksController = TextEditingController();
-
-  ConsentFormScreen({super.key});
+  Uint8List? _signatureData1;
+  Uint8List? _signatureData2;
 
   @override
   Widget build(BuildContext context) {
@@ -105,43 +110,59 @@ class ConsentFormScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16.0),
                 const Text('Unterschrift Patient/in:'),
-                SignatureTile(
-                  color: Colors.black,
-                  signatureKey: _signatureKey1,
-                  strokeWidth: 5.0,
-                  onSign: (isSigned) {
-                    // Handle the signature
-                  },
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                  ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignatureScreen(),
+                        ),
+                      );
+                      if (result != null) {
+                        setState(() {
+                          _signatureData1 = result;
+                        });
+                      }
+                    },
+                    child: _signatureData1 != null
+                        ? Image.memory(_signatureData1!)
+                        : const Center(child: Text('zum unterschreiben hier tippen')),
+                  ),
                 ),
                 const SizedBox(height: 16.0),
                 const Text('Unterschrift Behandler/in:'),
-                SignatureTile(
-                  color: Colors.black,
-                  signatureKey: _signatureKey2,
-                  strokeWidth: 5.0,
-                  onSign: (isSigned) {
-                    // Handle the signature
-                  },
+                Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                  ),
+                  child: GestureDetector(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignatureScreen(),
+                        ),
+                      );
+                      if (result != null) {
+                        setState(() {
+                          _signatureData2 = result;
+                        });
+                      }
+                    },
+                    child: _signatureData2 != null
+                        ? Image.memory(_signatureData2!)
+                        : const Center(child: Text('zum unterschreiben hier tippen')),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      final signature1 = await signaturePointsToImage(
-                        _signatureKey1.currentState!.points
-                            .whereType<Offset>()
-                            .toList(),
-                        Colors.black,
-                        5.0,
-                        const Size(500, 500),
-                      );
-                      final signature2 = await signaturePointsToImage(
-                        _signatureKey2.currentState!.points
-                            .whereType<Offset>()
-                            .toList(),
-                        Colors.black,
-                        5.0,
-                        const Size(500, 500),
-                      );
                       final consent = Consent(
                         userId: user.userId,
                         name: user.name,
@@ -150,8 +171,8 @@ class ConsentFormScreen extends StatelessWidget {
                         date: _date,
                         description: _descriptionController.text,
                         risks: _risksController.text,
-                        signature1: signature1,
-                        signature2: signature2,
+                        signature1: _signatureData1 ?? Uint8List(0),
+                        signature2: _signatureData2 ?? Uint8List(0),
                       );
                       user.consent = consent;
                       provider.updateUser(provider.selectedUserId!, user);

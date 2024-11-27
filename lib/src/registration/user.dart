@@ -32,6 +32,7 @@ class User {
   final DateTime? dateOfBirth;
   final DateTime? informationsbogenDate;
   final DateTime? einwilligungDate;
+  DateTime lastEdited;
   // final List<Offset?> signature1;
   // final List<Offset?> signature2;
   final Uint8List? signature1;
@@ -80,6 +81,7 @@ class User {
     required this.selectedNagelerkrankungen,
     required this.selectedNagelform,
     required this.selectedNagelspitzenform,
+    required this.lastEdited,
     this.consent,
     List<Note>? notes,
   })  : notes = notes ?? [],
@@ -134,7 +136,9 @@ class User {
       selectedNagelerkrankungen: json['selectedNagelerkrankungen'],
       selectedNagelform: json['selectedNagelform'],
       selectedNagelspitzenform: json['selectedNagelspitzenform'],
-
+      lastEdited: json['lastEdited'] != null
+        ? DateTime.parse(json['lastEdited'])
+        : DateTime.now(),
       notes: json['notes'] != null
           ? (json['notes'] as List)
               .map((item) => Note.fromJson(Map<String, dynamic>.from(item)))
@@ -184,7 +188,7 @@ class User {
       'selectedNagelerkrankungen': selectedNagelerkrankungen,
       'selectedNagelform': selectedNagelform,
       'selectedNagelspitzenform': selectedNagelspitzenform,
-
+      'lastEdited': lastEdited.toIso8601String(),
       'notes': notes.map((item) => item.toJson()).toList(),
     };
   }
