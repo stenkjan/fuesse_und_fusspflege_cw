@@ -6,6 +6,7 @@ import 'package:fuesse_und_fusspflege_cw/src/registration/consent_from_screen.da
 import 'package:fuesse_und_fusspflege_cw/src/registration/notepad.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/registration_view.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_export.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -75,6 +76,7 @@ class UserList extends StatefulWidget {
 
 class UserListState extends State<UserList> {
   int? _selectedUserIndex;
+  String _sortCriteria = 'last_edited';
 
   @override
   void initState() {
@@ -85,14 +87,61 @@ class UserListState extends State<UserList> {
     });
   }
 
+  void _sortUsers(List<User> users) {
+    switch (_sortCriteria) {
+      case 'name_asc':
+        users.sort((a, b) => a.name.compareTo(b.name));
+        break;
+      case 'name_desc':
+        users.sort((a, b) => b.name.compareTo(a.name));
+        break;
+      case 'last_edited':
+        users.sort((a, b) => b.lastEdited.compareTo(a.lastEdited));
+        break;
+      case 'standard':
+        users.sort((a, b) => a.lastEdited.compareTo(b.lastEdited));
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final userListProvider = context.watch<UserListProvider>();
     final users = userListProvider.userList;
+    _sortUsers(users);
+
     return Scaffold(
+      backgroundColor: const Color.fromARGB(102, 119, 199, 216),
       appBar: AppBar(
-        title: const Text('Kundenliste'),
+        backgroundColor: const Color.fromARGB(102, 94, 196, 219),
+        title: Text('Kundenliste (${users.length})'),
         actions: <Widget>[
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.sort),
+            onSelected: (String result) {
+              setState(() {
+                _sortCriteria = result;
+              });
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'name_asc',
+                child: Text('Alphabetisch (aufsteigend)'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'name_desc',
+                child: Text('Alphabetisch (absteigend)'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'last_edited',
+                child: Text('Zuletzt bearbeitet (absteigend)'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'standard',
+                child: Text('Zuletzt bearbeitet (aufsteigend)'),
+              ),
+            ],
+          ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () async {
@@ -110,134 +159,170 @@ class UserListState extends State<UserList> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: users.length,
-        itemBuilder: (context, index) {
-          final user = users[index];
-          return Material(
-            child: ListTile(
-              leading: Radio(
-                fillColor: WidgetStateProperty.all(Colors.blueAccent),
-                value: user.userId,
-                groupValue:
-                    Provider.of<UserListProvider>(context, listen: false)
-                        .selectedUserId,
-                onChanged: (String? value) {
-                  Provider.of<UserListProvider>(context, listen: false)
-                      .selectUser(value!);
-                },
-              ),
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(user.name),
-                  Text(
-                    DateFormat('MM.yy HH:mm').format(user.lastEdited),
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-              subtitle:
-                  Text(DateFormat('dd.MM.yyyy').format(user.dateOfBirth!)),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    icon: const Icon(Icons.note_add),
-                    onPressed: () {
-                      Provider.of<UserListProvider>(context, listen: false)
-                          .selectUser(user.userId);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ConsentFormScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.note),
-                    color: user.notes.isNotEmpty ? Colors.blue : Colors.grey,
-                    onPressed: () async {
-                      Provider.of<UserListProvider>(context, listen: false)
-                          .selectUser(user.userId);
-                      final updatedUser = await Navigator.push<User>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NotepadScreen(
-                            user: user,
-                            users: users,
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          itemCount: users.length,
+          itemBuilder: (context, index) {
+            final user = users[index];
+            return GestureDetector(
+              onTap: () {
+                Provider.of<UserListProvider>(context, listen: false)
+                    .selectUser(user.userId);
+              },
+              child: Card(
+                elevation: 4.0,
+                margin: const EdgeInsets.symmetric(vertical: 4.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Radio(
+                            fillColor:
+                                MaterialStateProperty.all(Colors.blueAccent),
+                            value: user.userId,
+                            groupValue: Provider.of<UserListProvider>(context,
+                                    listen: false)
+                                .selectedUserId,
+                            onChanged: (String? value) {
+                              Provider.of<UserListProvider>(context,
+                                      listen: false)
+                                  .selectUser(value!);
+                            },
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                           ),
-                        ),
-                      );
-
-                      if (updatedUser != null) {
-                        updatedUser.notes = user.notes;
-                        userListProvider.updateUser(user.userId, updatedUser);
-                      }
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      Provider.of<UserListProvider>(context, listen: false)
-                          .selectUser(user.userId);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Scaffold(
-                            appBar: AppBar(
-                              title: const Text(
-                                'Kunde bearbeiten',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              elevation: 5.0, // This adds shadow
-                              backgroundColor: Colors.blue[300],
-                            ),
-                            body: RegistrationForm(user: user),
+                          const SizedBox(width: 8.0),
+                          Text(user.name, style: const TextStyle(fontSize: 18)),
+                        ],
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        'bearbeitet: ${DateFormat('MM.yy HH:mm').format(user.lastEdited)}',
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        'Geburtstag: ${DateFormat('dd.MM.yyyy').format(user.dateOfBirth!)}',
+                        style:
+                            const TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          IconButton(
+                            icon: const Icon(Icons.note_add, size: 20),
+                            onPressed: () {
+                              Provider.of<UserListProvider>(context,
+                                      listen: false)
+                                  .selectUser(user.userId);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ConsentFormScreen(),
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () async {
-                      Provider.of<UserListProvider>(context, listen: false)
-                          .selectUser(user.userId);
-                      final confirm = await showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Löschen bestätigen'),
-                            content: const Text(
-                                'Sicher, dass du den Kundeneintrag löschen willst?'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(true),
-                                child: const Text('Ja'),
-                              ),
-                              TextButton(
-                                onPressed: () =>
-                                    Navigator.of(context).pop(false),
-                                child: const Text('Nein'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                          IconButton(
+                            icon: const Icon(Icons.note, size: 20),
+                            color: user.notes.isNotEmpty
+                                ? Colors.blue
+                                : Colors.grey,
+                            onPressed: () async {
+                              Provider.of<UserListProvider>(context,
+                                      listen: false)
+                                  .selectUser(user.userId);
+                              final updatedUser = await Navigator.push<User>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => NotepadScreen(
+                                    user: user,
+                                    users: users,
+                                  ),
+                                ),
+                              );
 
-                      if (confirm == true) {
-                        userListProvider.removeUser(user.userId);
-                      }
-                    },
+                              if (updatedUser != null) {
+                                updatedUser.notes = user.notes;
+                                userListProvider.updateUser(
+                                    user.userId, updatedUser);
+                              }
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.edit, size: 20),
+                            onPressed: () {
+                              Provider.of<UserListProvider>(context,
+                                      listen: false)
+                                  .selectUser(user.userId);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Scaffold(
+                                    appBar: AppBar(
+                                      title: const Text(
+                                        'Kunde bearbeiten',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      elevation: 5.0, // This adds shadow
+                                      backgroundColor: Colors.blue[300],
+                                    ),
+                                    body: RegistrationForm(user: user),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, size: 20),
+                            onPressed: () async {
+                              Provider.of<UserListProvider>(context,
+                                      listen: false)
+                                  .selectUser(user.userId);
+                              final confirm = await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Löschen bestätigen'),
+                                    content: const Text(
+                                        'Sicher, dass du den Kundeneintrag löschen willst?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: const Text('Ja'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: const Text('Nein'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (confirm == true) {
+                                userListProvider.removeUser(user.userId);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: userListProvider.selectedUser == null
@@ -292,14 +377,16 @@ class UserListState extends State<UserList> {
                             Navigator.pop(context);
                           },
                         ),
-                        // ListTile(
-                        //   leading: const Icon(Icons.backup),
-                        //   title: const Text('Backup Exportieren'),
-                        //   onTap: () async {
-                        //     await userListProvider.exportUserList();
-                        //     Navigator.pop(context);
-                        //   },
-                        // ),
+                        ListTile(
+                          leading: const Icon(Icons.backup),
+                          title: const Text('Backup Exportieren'),
+                          onTap: () async {
+                            final exporter =
+                                UserListExporter(userListProvider.userList);
+                            await exporter.exportUserList();
+                            Navigator.pop(context);
+                          },
+                        ),
                       ],
                     );
                   },
@@ -310,7 +397,6 @@ class UserListState extends State<UserList> {
     );
   }
 }
-
 // final List<User> _users = [
 //   User(
 //     name: 'John Smith',

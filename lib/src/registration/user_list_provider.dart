@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-// import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
 import 'package:path_provider/path_provider.dart';
@@ -10,6 +9,7 @@ import 'user_list.dart';
 class UserListProvider with ChangeNotifier {
   List<User> _userList = [];
   String? selectedUserId;
+  DateTime? _lastBackupDate;
 
   String _title = 'Nageldesign und Fußpflege';
 
@@ -35,6 +35,7 @@ class UserListProvider with ChangeNotifier {
   Future<void> loadUserList() async {
     try {
       _userList = await readUserList();
+      _lastBackupDate = await _getLastBackupDate();
     } catch (e) {
       _userList = [];
     }
@@ -44,7 +45,7 @@ class UserListProvider with ChangeNotifier {
   Future<void> addUser(User user) async {
     _userList.add(user);
     await _saveUserList();
-    await backupUserList();
+    await _checkAndBackupUserList();
     notifyListeners();
   }
 
@@ -68,6 +69,7 @@ class UserListProvider with ChangeNotifier {
       updatedUser.lastEdited = DateTime.now();
       _userList[index] = updatedUser;
       await _saveUserList();
+      await _checkAndBackupUserList();
       notifyListeners();
       return true;
     }
@@ -78,22 +80,21 @@ class UserListProvider with ChangeNotifier {
     if (userId == null) return;
     _userList.removeWhere((user) => user.userId == userId);
     await _saveUserList();
+    await _checkAndBackupUserList();
     notifyListeners();
   }
 
-  // Future<void> startBackup() async {
-  //   print("Backup started");
-  //   await AndroidAlarmManager.periodic(
-  //     const Duration(days: 1),
-  //     0, // id
-  //     backupUserList,
-  //     wakeup: true,
-  //     exact: true,
-  //     rescheduleOnReboot: true,
-  //   );
-  // }
+  Future<void> _checkAndBackupUserList() async {
+    final now = DateTime.now();
+    if (_lastBackupDate == null ||
+        now.difference(_lastBackupDate!).inDays >= 30) {
+      await _backupUserList(now);
+      _lastBackupDate = now;
+      await _saveLastBackupDate(now);
+    }
+  }
 
-  Future<void> backupUserList() async {
+  Future<void> _backupUserList(DateTime now) async {
     print("BackupList started");
     var status = await Permission.manageExternalStorage.status;
     if (!status.isGranted) {
@@ -109,7 +110,8 @@ class UserListProvider with ChangeNotifier {
       await appDirectory.create();
     }
     print(appDirectory.path);
-    final backupFile = File('${appDirectory.path}/backup.json');
+    final backupFile = File(
+        '${appDirectory.path}/backup_${now.month.toString().padLeft(2, '0')}${now.year}.json');
     final userListJson =
         jsonEncode(_userList.map((user) => user.toJson()).toList());
     await backupFile.writeAsString(userListJson);
@@ -134,5 +136,21 @@ class UserListProvider with ChangeNotifier {
     } else {
       throw Exception('Datei existiert nicht');
     }
+  }
+
+  Future<DateTime?> _getLastBackupDate() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/last_backup_date.txt');
+    if (await file.exists()) {
+      final dateStr = await file.readAsString();
+      return DateTime.tryParse(dateStr);
+    }
+    return null;
+  }
+
+  Future<void> _saveLastBackupDate(DateTime date) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/last_backup_date.txt');
+    await file.writeAsString(date.toIso8601String());
   }
 }

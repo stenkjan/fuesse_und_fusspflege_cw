@@ -4,6 +4,7 @@ import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_provider.dar
 import 'package:provider/provider.dart';
 import 'user_list.dart';
 import 'registration_view.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_export.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -34,8 +35,7 @@ class _MainViewState extends State<MainView> {
           style: const TextStyle(color: Colors.white),
         ),
         elevation: 5.0, // This adds shadow
-        backgroundColor:
-            Colors.blue[300], // This sets the background color to indigo
+        backgroundColor: Colors.blue[300], // This sets the background color to indigo
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: (String result) async {
@@ -57,6 +57,22 @@ class _MainViewState extends State<MainView> {
                     );
                   }
                 }
+              } else if (result == 'Export') {
+                final exporter = UserListExporter(Provider.of<UserListProvider>(context, listen: false).userList);
+                try {
+                  await exporter.exportUserList();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Backup erfolgreich exportiert und per E-Mail gesendet'),
+                    ),
+                  );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Fehler beim Exportieren des Backups'),
+                    ),
+                  );
+                }
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -64,16 +80,21 @@ class _MainViewState extends State<MainView> {
                 value: 'Import',
                 child: Text('Backup Importieren'),
               ),
+              const PopupMenuItem<String>(
+                value: 'Export',
+                child: Text('Backup Exportieren'),
+              ),
             ],
           ),
         ],
       ),
       body: _widgetOptions[_selectedIndex](),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
+            icon: const Icon(Icons.list),
             label: 'Kundenliste',
+            backgroundColor:const Color.fromARGB(205, 100, 180, 246),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),

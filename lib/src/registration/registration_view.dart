@@ -640,28 +640,31 @@ class _RegistrationFormState extends State<RegistrationForm> {
             ),
             ListTile(
               title: const Text('Unterschrift'),
-              subtitle: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                ),
-                child: GestureDetector(
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SignatureScreen(),
-                      ),
-                    );
-                    if (result != null) {
-                      setState(() {
-                        _signatureData1 = result;
-                      });
-                    }
-                  },
+              subtitle: GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignatureScreen(),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _signatureData1 = result;
+                    });
+                  }
+                },
+                child: Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                  ),
+                  width: double
+                      .infinity, // Ensure the container takes the full width
                   child: _signatureData1 != null
                       ? Image.memory(_signatureData1!)
-                      : const Center(child: Text('Tap to sign')),
+                      : const Center(
+                          child: Text('Zum unterschreiben anklicken')),
                 ),
               ),
             ),
@@ -754,28 +757,31 @@ class _RegistrationFormState extends State<RegistrationForm> {
             ),
             ListTile(
               title: const Text('Unterschrift'),
-              subtitle: Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                ),
-                child: GestureDetector(
-                  onTap: () async {
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SignatureScreen(),
-                      ),
-                    );
-                    if (result != null) {
-                      setState(() {
-                        _signatureData2 = result;
-                      });
-                    }
-                  },
+              subtitle: GestureDetector(
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignatureScreen(),
+                    ),
+                  );
+                  if (result != null) {
+                    setState(() {
+                      _signatureData2 = result;
+                    });
+                  }
+                },
+                child: Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black),
+                  ),
+                  width: double
+                      .infinity, // Ensure the container takes the full width
                   child: _signatureData2 != null
                       ? Image.memory(_signatureData2!)
-                      : const Center(child: Text('Tap to sign')),
+                      : const Center(
+                          child: Text('Zum unterschreiben anklicken')),
                 ),
               ),
             ),

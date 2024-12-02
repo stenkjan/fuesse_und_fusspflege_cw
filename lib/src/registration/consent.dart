@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -146,26 +148,48 @@ Future<File> generateConsentPdf(Consent consent) async {
 
 Future<void> generateConsentPdfAndSend(Consent consent, User user) async {
   // Generate the consent PDF
-  final file = await generateConsentPdf(consent);
+  try {
+    final file = await generateConsentPdf(consent);
 
-  // Load the pre-existing PDF
-  final pdfData = await rootBundle.load('assets/datenschutzPDF.pdf');
-  final tempDir = await getTemporaryDirectory();
-  final tempFile = File('${tempDir.path}/datenschutzPDF.pdf');
-  await tempFile.writeAsBytes(pdfData.buffer.asUint8List());
-  final date = DateFormat('dd.MM.yyyy')
-      .format(consent.date ?? DateTime.now());
+    // Load the pre-existing PDF
+    final pdfData = await rootBundle.load('assets/datenschutzPDF.pdf');
+    final tempDir = await getTemporaryDirectory();
+    final tempFile = File('${tempDir.path}/datenschutzPDF.pdf');
+    await tempFile.writeAsBytes(pdfData.buffer.asUint8List());
+    final date =
+        DateFormat('dd.MM.yyyy').format(consent.date ?? DateTime.now());
 
-  // Send both PDFs in an email
-  final email = Email(
-    body: 'Einverständniserklärung von ${user.name}',
-    subject: 'Einverständniserklärung vom $date',
-    recipients: [
-      user.email,
-    ], // Replace with the recipient's email address
-    attachmentPaths: [file.path, tempFile.path],
-    isHTML: false,
-  );
+    // Send both PDFs in an email
+    final email = Email(
+      body: 'Einverständniserklärung von ${user.name}',
+      subject: 'Einverständniserklärung vom $date',
+      recipients: [
+        user.email,
+      ], // Replace with the recipient's email address
+      attachmentPaths: [file.path, tempFile.path],
+      isHTML: false,
+    );
 
-  await FlutterEmailSender.send(email);
+    await FlutterEmailSender.send(email);
+    Fluttertoast.showToast(
+      msg: 'Consent erfolgreich exportiert und per E-Mail gesendet',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+  } catch (e) {
+    Fluttertoast.showToast(
+      msg: 'Consent konnte nicht exportiert werden: $e',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    rethrow;
+  }
 }

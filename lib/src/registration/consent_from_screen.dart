@@ -120,7 +120,7 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignatureScreen(),
+                          builder: (context) => const SignatureScreen(),
                         ),
                       );
                       if (result != null) {
@@ -146,7 +146,7 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignatureScreen(),
+                          builder: (context) => const SignatureScreen(),
                         ),
                       );
                       if (result != null) {

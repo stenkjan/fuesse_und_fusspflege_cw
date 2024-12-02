@@ -92,19 +92,19 @@ class UserSearch extends SearchDelegate<User?> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: const Text('Confirm'),
+                              title: const Text('Löschen bestätigen'),
                               content: const Text(
                                   'Sicher, dass du den Kundeneintrag löschen willst?'),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () =>
-                                      Navigator.of(context).pop(true),
-                                  child: const Text('Ja'),
+                                      Navigator.of(context).pop(false),
+                                  child: const Text('Nein'),
                                 ),
                                 TextButton(
                                   onPressed: () =>
-                                      Navigator.of(context).pop(false),
-                                  child: const Text('Nein'),
+                                      Navigator.of(context).pop(true),
+                                  child: const Text('Ja'),
                                 ),
                               ],
                             );
@@ -113,6 +113,7 @@ class UserSearch extends SearchDelegate<User?> {
 
                         if (confirm == true) {
                           userListProvider.removeUser(users[entry.key].userId);
+                          showResults(context); // Refresh the search results
                         }
                       },
                     ),

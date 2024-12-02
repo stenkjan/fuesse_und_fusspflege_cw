@@ -16,44 +16,52 @@ class NotepadScreen extends StatefulWidget {
   _NotepadScreenState createState() => _NotepadScreenState();
 }
 
-class _NotepadScreenState extends State<NotepadScreen>
-    with WidgetsBindingObserver {
+class _NotepadScreenState extends State<NotepadScreen> {
   final _controller = TextEditingController();
+  bool _isSaving = false;
+  Note? _selectedNote;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    _controller.dispose();
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      _saveNote();
-    }
-  }
-
-  Future<bool> _onWillPop() async {
-    _saveNote();
-    return true;
-  }
-
   void _saveNote() async {
-    final note = Note(
-      userId: widget.user.userId,
-      text: _controller.text,
-      date: DateTime.now(),
-    );
-    setState(() {
-      widget.user.notes.add(note);
-    });
+    if (_isSaving) return;
+    _isSaving = true;
+
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      _isSaving = false;
+      return;
+    }
+
+    if (_selectedNote != null) {
+      // Update the selected note
+      setState(() {
+        _selectedNote!.text = text;
+        _selectedNote!.date = DateTime.now();
+      });
+    } else {
+      // Create a new note
+      final note = Note(
+        userId: widget.user.userId,
+        text: text,
+        date: DateTime.now(),
+      );
+      setState(() {
+        widget.user.notes.add(note);
+      });
+    }
+
     _controller.clear();
+    _selectedNote = null;
 
     final userListProvider =
         Provider.of<UserListProvider>(context, listen: false);
@@ -66,7 +74,7 @@ class _NotepadScreenState extends State<NotepadScreen>
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.black,
         textColor: Colors.white,
         fontSize: 16.0,
       );
@@ -83,6 +91,7 @@ class _NotepadScreenState extends State<NotepadScreen>
     }
 
     widget.user.hasNotes.value = true;
+    _isSaving = false;
 
     // Pop the NotepadScreen and return the updated user
     Navigator.pop(context, widget.user);
@@ -90,53 +99,53 @@ class _NotepadScreenState extends State<NotepadScreen>
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Notizen'),
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _controller,
-                decoration: const InputDecoration(
-                  hintText: 'Deine Notiz...',
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Notizen'),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                hintText: 'Deine Notiz...',
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.user.notes.length,
-                itemBuilder: (context, index) {
-                  final note = widget.user.notes[index];
-                  return ListTile(
-                    title: Text(note.text),
-                    subtitle:
-                        Text(DateFormat('dd.MM.yyyy HH:mm').format(note.date)),
-                    onTap: () {
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: widget.user.notes.length,
+              itemBuilder: (context, index) {
+                final note = widget.user.notes[index];
+                return ListTile(
+                  title: Text(note.text),
+                  subtitle:
+                      Text(DateFormat('dd.MM.yyyy HH:mm').format(note.date)),
+                  onTap: () {
+                    setState(() {
                       _controller.text = note.text;
+                      _selectedNote = note;
+                    });
+                  },
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      setState(() {
+                        widget.user.notes.removeAt(index);
+                      });
                     },
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        setState(() {
-                          widget.user.notes.removeAt(index);
-                        });
-                      },
-                    ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _saveNote,
-          child: const Icon(Icons.save),
-        ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _saveNote,
+        child: const Icon(Icons.save),
       ),
     );
   }
