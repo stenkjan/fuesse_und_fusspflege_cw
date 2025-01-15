@@ -79,6 +79,7 @@ Future<File> generateConsentPdf(Consent consent) async {
             ),
             pw.SizedBox(height: 2),
             pw.Divider(thickness: 0.2),
+            pw.SizedBox(height: 2),
             pw.Text(
                 'Der/die Behandler/in hat mich in einer mir verständlichen Form über Art, Umfang und Durchführung der oben genannten Maßnahme aufgeklärt.'),
             pw.SizedBox(height: 2),
@@ -100,14 +101,28 @@ Future<File> generateConsentPdf(Consent consent) async {
             ),
             pw.SizedBox(height: 2),
             pw.Divider(thickness: 0.2),
+            pw.SizedBox(height: 2),
             pw.Text(
                 'Mir wurde mitgeteilt, wie ich mich in der Zeit nach der Behandlung verhalten soll, damit ein optimales Behandlungsergebnis erzielt werden kann.'),
             pw.SizedBox(height: 2),
             pw.Divider(thickness: 0.2),
+            pw.SizedBox(height: 2),
             pw.Text(
                 'Ich hatte Gelegenheit, ergänzende Fragen zu stellen. Meine Fragen wurden mir ausführlich und gut verständlich beantwortet.'),
             pw.SizedBox(height: 2),
             pw.Divider(thickness: 0.2),
+            pw.SizedBox(height: 2),
+            pw.Divider(thickness: 0.2),
+            pw.SizedBox(height: 2),
+            pw.Text(
+                'Vereinbarte Termine sind einzuhalten und können bis 24 Stunden vor Terminbeginn kostenfrei abgesagt werden.\n\n'
+                'Sollte die Absage später oder gar nicht erfolgen, ist das Nagelstudio gemäß §615 BGB dazu berechtigt, den entstandenen Ausfall in Rechnung zu stellen, soweit in der Zeit des geplanten Termins keine Ersatzeinnahmen erwirtschaftet werden konnten.\n\n'
+                'Die Höhe der Ausfallgebühr beträgt 50% der Kosten für die Leistung, die Sie bei mir gebucht haben.\n\n'
+                'Eine Absage kann per Email auf meiner Webseite, per Anruf oder per WhatsApp erfolgen.\n\n'
+                'Ich stimme den Terminregeln zu'),
+            pw.SizedBox(height: 2),
+            pw.Divider(thickness: 0.2),
+            pw.SizedBox(height: 10),
             pw.Text(
                 'Ich bin einverstanden, dass die oben genannten Maßnahmen vorgenommen und ggf. auch fotografisch dokumentiert werden.'),
             pw.SizedBox(height: 2),
