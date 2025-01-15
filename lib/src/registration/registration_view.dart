@@ -8,9 +8,7 @@ import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user_list_provider.dart';
 import 'package:intl/intl.dart';
 // import 'package:flutter_signature_pad/flutter_signature_pad.dart';
-import 'user_signature.dart' as sig;
 import 'package:provider/provider.dart';
-import 'package:fuesse_und_fusspflege_cw/src/registration/user_signature.dart';
 import 'package:uuid/uuid.dart';
 
 class RegistrationForm extends StatefulWidget {

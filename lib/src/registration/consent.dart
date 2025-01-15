@@ -49,7 +49,7 @@ Future<File> generateConsentPdf(Consent consent) async {
               alignment: pw.Alignment.centerLeft,
               child: pw.RichText(
                 text: pw.TextSpan(
-                  text: 'Name, Vorname: ',
+                  text: 'Name: ',
                   style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                   children: <pw.TextSpan>[
                     pw.TextSpan(

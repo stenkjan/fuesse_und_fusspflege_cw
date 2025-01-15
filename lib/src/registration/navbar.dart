@@ -90,11 +90,11 @@ class _MainViewState extends State<MainView> {
       ),
       body: _widgetOptions[_selectedIndex](),
       bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: const Icon(Icons.list),
+            icon: Icon(Icons.list),
             label: 'Kundenliste',
-            backgroundColor:const Color.fromARGB(205, 100, 180, 246),
+            backgroundColor:Color.fromARGB(205, 100, 180, 246),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.add),

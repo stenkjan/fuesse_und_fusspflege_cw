@@ -17,7 +17,8 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _placeController = TextEditingController();
   DateTime _date = DateTime.now();
-  final _dateController = TextEditingController(text: DateFormat('dd.MM.yyyy').format(DateTime.now()));
+  final _dateController = TextEditingController(
+      text: DateFormat('dd.MM.yyyy').format(DateTime.now()));
   final _descriptionController = TextEditingController();
   final _risksController = TextEditingController();
   Uint8List? _signatureData1;
@@ -40,7 +41,7 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Text('Name, Vorname: ${user!.name}'),
+                Text('Name: ${user!.name}'),
                 Text('Adresse: ${user.strasse} ${user.plzOrt}'),
                 TextFormField(
                   controller: _descriptionController,
@@ -54,8 +55,12 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 2),
+                const Divider(thickness: 0.2),
+                const SizedBox(height: 5),
                 const Text(
                     'Der/die Behandler/in hat mich in einer mir verständlichen Form über Art, Umfang und Durchführung der oben genannten Maßnahme aufgeklärt.'),
+                const SizedBox(height: 5),
                 const Text('Ich wurde über folgende Risiken aufgeklärt:'),
                 TextFormField(
                   controller: _risksController,
@@ -69,12 +74,22 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 5),
                 const Text(
                     'Mir wurde mitgeteilt, wie ich mich in der Zeit nach der Behandlung verhalten soll, damit ein optimales Behandlungsergebnis erzielt werden kann.'),
+                const SizedBox(height: 5),
                 const Text(
                     'Ich hatte Gelegenheit, ergänzende Fragen zu stellen. Meine Fragen wurden mir ausführlich und gut verständlich beantwortet.'),
+                const SizedBox(height: 5),
                 const Text(
                     'Ich bin einverstanden, dass die oben genannten Maßnahmen vorgenommen und ggf. auch fotografisch dokumentiert werden.'),
+                const SizedBox(height: 5),
+                const Text(
+                    'Vereinbarte Termine sind einzuhalten und können bis 24 Stunden vor Terminbeginn kostenfrei abgesagt werden.\n\n'
+                    'Sollte die Absage später oder gar nicht erfolgen, ist das Nagelstudio gemäß §615 BGB dazu berechtigt, den entstandenen Ausfall in Rechnung zu stellen, soweit in der Zeit des geplanten Termins keine Ersatzeinnahmen erwirtschaftet werden konnten.\n\n'
+                    'Die Höhe der Ausfallgebühr beträgt 50% der Kosten für die Leistung, die Sie bei mir gebucht haben.\n\n'
+                    'Eine Absage kann per Email auf meiner Webseite, per Anruf oder per WhatsApp erfolgen.\n\n'
+                    'Ich stimme den Terminregeln zu'),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: _placeController,
@@ -131,7 +146,8 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
                     },
                     child: _signatureData1 != null
                         ? Image.memory(_signatureData1!)
-                        : const Center(child: Text('zum unterschreiben hier tippen')),
+                        : const Center(
+                            child: Text('zum unterschreiben hier tippen')),
                   ),
                 ),
                 const SizedBox(height: 16.0),
@@ -157,7 +173,8 @@ class _ConsentFormScreenState extends State<ConsentFormScreen> {
                     },
                     child: _signatureData2 != null
                         ? Image.memory(_signatureData2!)
-                        : const Center(child: Text('zum unterschreiben hier tippen')),
+                        : const Center(
+                            child: Text('zum unterschreiben hier tippen')),
                   ),
                 ),
                 ElevatedButton(
