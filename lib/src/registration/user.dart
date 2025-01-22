@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/consent.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/policies.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/note.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -47,6 +48,7 @@ class User {
 
   List<Note> notes;
   Consent? consent;
+  Policies? policies;
   ValueNotifier<bool> hasNotes;
 
   User({
@@ -83,6 +85,7 @@ class User {
     required this.selectedNagelspitzenform,
     required this.lastEdited,
     this.consent,
+    this.policies,
     List<Note>? notes,
   })  : notes = notes ?? [],
         hasNotes = ValueNotifier((notes ?? []).isNotEmpty);
@@ -137,13 +140,17 @@ class User {
       selectedNagelform: json['selectedNagelform'],
       selectedNagelspitzenform: json['selectedNagelspitzenform'],
       lastEdited: json['lastEdited'] != null
-        ? DateTime.parse(json['lastEdited'])
-        : DateTime.now(),
+          ? DateTime.parse(json['lastEdited'])
+          : DateTime.now(),
       notes: json['notes'] != null
           ? (json['notes'] as List)
               .map((item) => Note.fromJson(Map<String, dynamic>.from(item)))
               .toList()
           : [],
+      consent:
+          json['consent'] != null ? Consent.fromJson(json['consent']) : null,
+      policies:
+          json['policies'] != null ? Policies.fromJson(json['policies']) : null,
     );
   }
 
@@ -190,6 +197,8 @@ class User {
       'selectedNagelspitzenform': selectedNagelspitzenform,
       'lastEdited': lastEdited.toIso8601String(),
       'notes': notes.map((item) => item.toJson()).toList(),
+      if (consent != null) 'consent': consent!.toJson(),
+      if (policies != null) 'policies': policies!.toJson(),
     };
   }
 }
@@ -762,8 +771,11 @@ Future<void> generatePdfAndSend(List<User> users) async {
     recipients: [
       users.first.email,
     ],
-    attachmentPaths: [file.path, tempFile.path, if (consentFile != null) ...[consentFile.path]]
-      ,
+    attachmentPaths: [
+      file.path,
+      tempFile.path,
+      if (consentFile != null) ...[consentFile.path]
+    ],
     isHTML: false,
   );
 

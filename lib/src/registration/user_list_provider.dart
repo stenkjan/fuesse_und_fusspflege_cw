@@ -63,10 +63,20 @@ class UserListProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> updateUser(String userId, User updatedUser) async {
+Future<bool> updateUser(String userId, User updatedUser) async {
     int index = _userList.indexWhere((user) => user.userId == userId);
     if (index != -1) {
+      User existingUser = _userList[index];
       updatedUser.lastEdited = DateTime.now();
+
+      // Preserve consent and policies if they are null in the updated user
+      if (updatedUser.consent == null) {
+        updatedUser.consent = existingUser.consent;
+      }
+      if (updatedUser.policies == null) {
+        updatedUser.policies = existingUser.policies;
+      }
+
       _userList[index] = updatedUser;
       await _saveUserList();
       await _checkAndBackupUserList();

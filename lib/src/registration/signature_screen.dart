@@ -20,7 +20,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Signature'),
+        title: const Text('Unterschrift'),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -51,7 +51,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
               onPressed: () {
                 _controller.clear();
               },
-              child: const Text('Clear'),
+              child: const Text('Zurücksetzen'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -62,7 +62,7 @@ class _SignatureScreenState extends State<SignatureScreen> {
                   Navigator.pop(context, null);
                 }
               },
-              child: const Text('Save'),
+              child: const Text('Speichern'),
             ),
           ],
         ),

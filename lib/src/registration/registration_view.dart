@@ -913,7 +913,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 selectedNagelform: _selectedNagelform,
                 selectedNagelspitzenform: _selectedNagelspitzenform,
                 lastEdited: DateTime.now(),
-                notes: userNotes);
+                notes: userNotes,
+                consent: widget.user?.consent,
+                policies: widget.user?.policies);
 
             if (isEditingUser) {
               Provider.of<UserListProvider>(context, listen: false)

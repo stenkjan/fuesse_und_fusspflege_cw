@@ -10,7 +10,7 @@ environment:
   sdk: '>=3.3.0 <4.0.0'
 
 dependencies:
-  android_alarm_manager_plus: ^4.0.2
+  android_alarm_manager_plus: ^4.0.6
   file_picker: ^8.0.2
   flutter:
     sdk: flutter

@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/consent.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/policies.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/consent_from_screen.dart';
+import 'package:fuesse_und_fusspflege_cw/src/registration/policies_from_screen.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/notepad.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/registration_view.dart';
 import 'package:fuesse_und_fusspflege_cw/src/registration/user.dart';
@@ -201,7 +204,7 @@ class UserListState extends State<UserList> {
                       ),
                       const SizedBox(height: 4.0),
                       Text(
-                        'bearbeitet: ${DateFormat('MM.yy HH:mm').format(user.lastEdited)}',
+                        'bearbeitet: ${DateFormat('dd.MM.yy HH:mm').format(user.lastEdited)}',
                         style:
                             const TextStyle(fontSize: 18, color: Colors.grey),
                       ),
@@ -217,6 +220,9 @@ class UserListState extends State<UserList> {
                         children: <Widget>[
                           IconButton(
                             icon: const Icon(Icons.note_add, size: 20),
+                             color: user.consent != null
+                                ? Colors.blue
+                                : Colors.black,
                             onPressed: () {
                               Provider.of<UserListProvider>(context,
                                       listen: false)
@@ -230,11 +236,29 @@ class UserListState extends State<UserList> {
                               );
                             },
                           ),
+                            IconButton(
+                            icon: const Icon(Icons.handshake, size: 20),
+                             color: user.policies != null
+                                ? Colors.blue
+                                : Colors.black,
+                            onPressed: () {
+                              Provider.of<UserListProvider>(context,
+                                      listen: false)
+                                  .selectUser(user.userId);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const PoliciesFormScreen(),
+                                ),
+                              );
+                            },
+                          ),
                           IconButton(
                             icon: const Icon(Icons.note, size: 20),
                             color: user.notes.isNotEmpty
                                 ? Colors.blue
-                                : Colors.grey,
+                                : Colors.black,
                             onPressed: () async {
                               Provider.of<UserListProvider>(context,
                                       listen: false)
@@ -359,6 +383,28 @@ class UserListState extends State<UserList> {
                                 null) {
                               generateConsentPdf(
                                   userListProvider.selectedUser!.consent!);
+                            } else {
+                              Fluttertoast.showToast(
+                                msg: 'Keine Einwilligungserklärung vorhanden',
+                                toastLength: Toast.LENGTH_SHORT,
+                              );
+                            }
+                            Navigator.pop(context);
+                          },
+                        ),
+                         ListTile(
+                          leading: const Icon(Icons.picture_as_pdf),
+                          title: const Text('Terminregelvereinbarung als PDF'),
+                          onTap: () {
+                            if (userListProvider.selectedUser?.policies !=
+                                null) {
+                              generatePoliciesPdf(
+                                  userListProvider.selectedUser!.policies!);
+                            } else {
+                              Fluttertoast.showToast(
+                                msg: 'Keine Einwilligungserklärung vorhanden',
+                                toastLength: Toast.LENGTH_SHORT,
+                              );
                             }
                             Navigator.pop(context);
                           },
@@ -373,6 +419,11 @@ class UserListState extends State<UserList> {
                               generateConsentPdfAndSend(
                                   userListProvider.selectedUser!.consent!,
                                   userListProvider.selectedUser!);
+                            } else {
+                              Fluttertoast.showToast(
+                                msg: 'Keine Einwilligungserklärung vorhanden',
+                                toastLength: Toast.LENGTH_SHORT,
+                              );
                             }
                             Navigator.pop(context);
                           },
