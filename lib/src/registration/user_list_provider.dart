@@ -70,12 +70,8 @@ Future<bool> updateUser(String userId, User updatedUser) async {
       updatedUser.lastEdited = DateTime.now();
 
       // Preserve consent and policies if they are null in the updated user
-      if (updatedUser.consent == null) {
-        updatedUser.consent = existingUser.consent;
-      }
-      if (updatedUser.policies == null) {
-        updatedUser.policies = existingUser.policies;
-      }
+      updatedUser.consent ??= existingUser.consent;
+      updatedUser.policies ??= existingUser.policies;
 
       _userList[index] = updatedUser;
       await _saveUserList();

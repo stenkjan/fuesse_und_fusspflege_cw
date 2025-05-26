@@ -27,6 +27,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
             onPressed: () async {
               if (_controller.isNotEmpty) {
                 final Uint8List? data = await _controller.toPngBytes();
+                if (!mounted) return;
+                // ignore: use_build_context_synchronously
                 Navigator.pop(context, data);
               } else {
                 Navigator.pop(context, null);
@@ -35,11 +37,23 @@ class _SignatureScreenState extends State<SignatureScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: Signature(
-          controller: _controller,
-          height: 300,
-          backgroundColor: Colors.white,
+      body: Container(
+        color: Colors.grey[200],
+        child: Center(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 2.0),
+              ),
+              width: MediaQuery.of(context).size.width * 0.9,
+              height: 300,
+              child: Signature(
+                controller: _controller,
+                backgroundColor: Colors.white,
+              ),
+            ),
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
@@ -57,6 +71,8 @@ class _SignatureScreenState extends State<SignatureScreen> {
               onPressed: () async {
                 if (_controller.isNotEmpty) {
                   final Uint8List? data = await _controller.toPngBytes();
+                  if (!mounted) return;
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context, data);
                 } else {
                   Navigator.pop(context, null);
